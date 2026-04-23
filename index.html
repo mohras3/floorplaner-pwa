@@ -1,65 +1,39 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Floorplanner PWA</title>
-
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.json" />
-  <meta name="theme-color" content="#2c2416" />
-
-  <!-- Icons -->
-  <link rel="icon" href="./favicon.ico" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="./style.css" />
-
-  <!-- React (UMD) -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-  <!-- Babel (för JSX i browsern) -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <meta charset="UTF-8">
+  <title>GitHub Pages Test</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #faf6ef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #box {
+      padding: 40px;
+      border: 3px solid #2c2416;
+      background: #ffffff;
+      text-align: center;
+    }
+  </style>
 </head>
-
 <body>
-  <div id="root"></div>
 
-  <!-- App code -->
-  <script type="text/babel" data-presets="react">
-    /* ===== App.jsx (INLINE FÖR TEST) ===== */
+  <div id="box">
+    <h1>⏳ Laddar JavaScript…</h1>
+    <p>Om detta ändras fungerar GitHub Pages.</p>
+  </div>
 
-    function App() {
-      return (
-        <div style={{
-          padding: "40px",
-          fontFamily: "Georgia, serif",
-          background: "#faf6ef",
-          minHeight: "100vh"
-        }}>
-          <h1>✅ React + JSX fungerar</h1>
-          <p>
-            GitHub Pages kör nu React korrekt via Babel.
-          </p>
-          <p>
-            Nästa steg: stoppa in hela floorplanner‑appen.
-          </p>
-        </div>
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
-  </script>
-
-  <!-- Service Worker -->
   <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js");
-    }
+    document.getElementById("box").innerHTML = `
+      <h1>✅ JavaScript fungerar</h1>
+      <p>GitHub Pages kör koden korrekt.</p>
+    `;
   </script>
+
 </body>
 </html>
-``
