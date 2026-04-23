@@ -1,5 +1,5 @@
-import React from "https://esm.sh/react";
-import { createRoot } from "https://esm.sh/react-dom/client";
-import App from "./App.jsx"; // ← din nuvarande kod här
+const { createRoot } = ReactDOM;
 
-createRoot(document.getElementById("root")).render(<App />);
+const root = createRoot(document.getElementById("root"));
+root.render(<App />);
+``
