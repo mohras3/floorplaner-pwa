@@ -1,182 +1,79 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useReducer
-} from "https://esm.sh/react";
-
 /* =========================================================
-   KONSTANTER & HJÄLPFUNKTIONER
+   Floorplanner App.jsx
+   Körs via Babel Standalone (utan build-steg)
 ========================================================= */
 
-const GRID = 20;
-const snap = (v) => Math.round(v / GRID) * GRID;
-
-const ROOM_COLORS = [
-  "#e8d5b7","#b7d5e8","#b7e8c8","#e8b7b7",
-  "#e8e8b7","#d5b7e8","#b7e8e8","#f0cba8"
-];
-
-const ROOM_NAMES = [
-  "Vardagsrum","Kök","Sovrum","Badrum",
-  "Hall","Kontor","Förråd","Matsal"
-];
-
-const WALL_SIZES = [
-  { label: "Tunn (5cm)", v: 3 },
-  { label: "Normal (10cm)", v: 6 },
-  { label: "Tjock (20cm)", v: 12 },
-  { label: "Bärande (30cm)", v: 18 }
-];
-
-const TEXT_SIZES = [8,10,12,14,16,20,24,32];
-
-const TOOLS = [
-  { id: "wall",   label: "Vägg",    icon: "▬" },
-  { id: "room",   label: "Rum",     icon: "⬛" },
-  { id: "door",   label: "Dörr",    icon: "⌒" },
-  { id: "window", label: "Fönster", icon: "▭" },
-  { id: "stair",  label: "Trappa",  icon: "≡" },
-  { id: "vent",   label: "Ventil",  icon: "⊕" },
-  { id: "text",   label: "Text",    icon: "T" },
-  { id: "select", label: "Välj",    icon: "↖" },
-  { id: "erase",  label: "Radera",  icon: "✕" }
-];
-
-const STAIR_STEPS = [4, 6, 8, 10, 12, 14, 16];
-
-let _id = 1;
-const newId = () => _id++;
-
-/* =========================================================
-   UNDO / REDO
-========================================================= */
-
-function historyReducer(state, action) {
-  switch (action.type) {
-    case "SET": {
-      const past = [...state.past, state.present].slice(-80);
-      return { past, present: action.elements, future: [] };
-    }
-    case "UNDO": {
-      if (!state.past.length) return state;
-      const past = [...state.past];
-      const present = past.pop();
-      return { past, present, future: [state.present, ...state.future] };
-    }
-    case "REDO": {
-      if (!state.future.length) return state;
-      const [present, ...future] = state.future;
-      return { past: [...state.past, state.present], present, future };
-    }
-    default:
-      return state;
-  }
-}
-
-/* =========================================================
-   SYMBOLER (DÖRR, VENT, TRAPPA, TEXT)
-========================================================= */
-
-function DoorArch({ el, selected, onClick }) {
-  const dx = el.x2 - el.x1;
-  const dy = el.y2 - el.y1;
-  const len = Math.hypot(dx, dy);
-  if (len < 2) return null;
-
-  const ux = dx / len, uy = dy / len;
-  const px = -uy, py = ux;
-  const r = len;
-
-  const ax = el.x1 + px * r;
-  const ay = el.y1 + py * r;
-
-  const stroke = selected ? "#1d4ed8" : "#2c2416";
-  const t = el.thick || 6;
-
+function App() {
   return (
-    <g onClick={onClick} style={{ cursor: "pointer" }}>
-      <line x1={el.x1} y1={el.y1} x2={el.x2} y2={el.y2}
-            stroke="transparent" strokeWidth={20} />
-      <line x1={el.x1} y1={el.y1} x2={el.x2} y2={el.y2}
-            stroke={stroke} strokeWidth={t} />
-      <path
-        d={`M ${el.x2} ${el.y2} A ${r} ${r} 0 0 0 ${ax} ${ay}`}
-        fill="none"
-        stroke={stroke}
-        strokeWidth={1.5}
-        strokeDasharray="5 3"
-      />
-      <circle cx={el.x1} cy={el.y1} r={2.5} fill={stroke} />
-    </g>
-  );
-}
-
-function VentSymbol({ el, selected, onClick }) {
-  const cx = (el.x1 + el.x2) / 2;
-  const cy = (el.y1 + el.y2) / 2;
-  const r = Math.max(10, Math.hypot(el.x2 - el.x1, el.y2 - el.y1) / 2);
-  const stroke = selected ? "#1d4ed8" : "#4a7a6a";
-
-  return (
-    <g onClick={onClick} style={{ cursor: "pointer" }}>
-      <circle cx={cx} cy={cy} r={r}
-        fill="#d4ede8" fillOpacity={0.7}
-        stroke={stroke} strokeWidth={2} />
-      <text x={cx} y={cy + 4} textAnchor="middle"
-        fontSize={r * 0.6} fill={stroke}
-        fontFamily="Georgia,serif">V</text>
-    </g>
-  );
-}
-
-function TextEl({ el, selected, onClick, onDblClick }) {
-  return (
-    <g onClick={onClick} onDoubleClick={onDblClick}
-       style={{ cursor: "pointer" }}>
-      {selected && (
-        <rect
-          x={el.x - 4}
-          y={el.y - el.size - 2}
-          width={el.text.length * el.size * 0.65 + 8}
-          height={el.size + 8}
-          fill="none"
-          stroke="#1d4ed8"
-          strokeDasharray="4 2"
-          rx={2}
-        />
-      )}
-      <text
-        x={el.x}
-        y={el.y}
-        fontSize={el.size}
-        fill={el.color || "#2c2416"}
-        fontFamily="Georgia,serif"
-        fontWeight={el.bold ? "bold" : "normal"}
-        fontStyle={el.italic ? "italic" : "normal"}
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#faf6ef",
+        fontFamily: "Georgia, serif",
+        display: "flex",
+        flexDirection: "column"
+      }}
+    >
+      {/* Top bar */}
+      <div
+        style={{
+          background: "#2c2416",
+          color: "#e8d5b7",
+          padding: "12px 18px",
+          fontSize: "18px",
+          letterSpacing: "2px",
+          fontWeight: "bold",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.35)"
+        }}
       >
-        {el.text}
-      </text>
-    </g>
-  );
-}
+        PLANLÖSNING – PWA TEST
+      </div>
 
-/* =========================================================
-   HUVUDAPP
-========================================================= */
+      {/* Main content */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            padding: "40px",
+            maxWidth: "460px"
+          }}
+        >
+          <h1 style={{ marginBottom: "12px" }}>
+            ✅ App.jsx fungerar
+          </h1>
 
-export default function App() {
-  return (
-    <div style={{
-      height: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontFamily: "Georgia,serif",
-      background: "#faf6ef"
-    }}>
-      <h2>✅ App.jsx laddad korrekt</h2>
+          <p style={{ fontSize: "16px", lineHeight: 1.6 }}>
+            React + JSX kör nu korrekt via
+            <br />
+            <b>GitHub Pages + Babel</b>.
+          </p>
+
+          <div
+            style={{
+              marginTop: "28px",
+              padding: "16px",
+              border: "2px dashed #b7a99a",
+              borderRadius: "6px",
+              background: "#f5f0e8"
+            }}
+          >
+            Nästa steg:
+            <ul style={{ textAlign: "left", marginTop: "10px" }}>
+              <li>✔ Koppla in rit-canvas (SVG)</li>
+              <li>✔ Verktyg: vägg, rum, text</li>
+              <li>✔ Zoom, pan, undo</li>
+              <li>✔ Spara / ladda projekt</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
